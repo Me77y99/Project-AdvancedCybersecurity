@@ -149,7 +149,7 @@ Fatto ciò la macchina sarà infetta. Una volta avvenuto l'attacco lanciando il 
 ```bash
 sudo tripwire --check 
 ```
-inizierà la procedura di verifica la quale resituira il seguente report di output
+inizierà la procedura di verifica la quale resituira il seguente report di output:
 
 ![report](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Tripwire%20detect.png)
 
