@@ -24,7 +24,7 @@ sudo apt install python3
 ```
 Fatto ciò  si può procedere ad effettuare un attacco di reverse shell TCP verso la macchina target tramite *Metasploit*. Aprire 4 terminali:
 
- 1. **Terminale**: Ottenere indirizzo ip del target 
+ 1. **Terminale**: Ottenere indirizzo ip dell'interfaccia di rete della macchina kali 
  ```bash
 ifconfig
 ```
