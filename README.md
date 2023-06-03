@@ -1,7 +1,7 @@
 
 # ProjectAdvancedCybersecurity
 Il seguente repository ha lo scopo di illustrare come configurare una rete di macchine virtuali al fine di testare alcuni software legati alla sicurezza informatica. L' architettura viene riportata in figura.
-![Architettura della rete](Screened Network.drawio.png)
+![Architettura della rete](https://github.com/Me77y99/Project-AdvancedCybersecurity/Screened Network.drawio.png)
 Le macchine virtuali sono le seguenti: 
  - **Target**: Ubuntu 22.04.2 LTS (con installato *Tripwire*)
  - **Attacker**: Kali 2023.1 (con installato *python3*)
