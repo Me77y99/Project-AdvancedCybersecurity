@@ -74,7 +74,7 @@ Nella macchina target la prima cosa da fare è installare Tripwire che ci permet
 sudo apt-get update
 sudo apt-get install tripwire
 ```
-Lasciando inalterate le impostazioni di configurazione di default, Tripwire ti chiederà di creare due chiavi per proteggere i suoi file di configurazione.
+Lasciando inalterate le impostazioni di configurazione di default, Tripwire ti chiederà di creare due chiavi.
 
 -   **site key** : questa chiave viene utilizzata per proteggere i file di configurazione. Dobbiamo assicurarci che i file di configurazione non vengano modificati, altrimenti non ci si può fidare del nostro intero sistema di rilevamento. 
     
@@ -117,6 +117,7 @@ Ora che abbiamo un elenco di file che attivano tripwire, possiamo esaminare il n
 sudo nano /etc/tripwire/twpol.txt
 ```
 Eseguire una ricerca per ciascuno dei file restituiti in`test_results`. Commenta tutte le righe che trovi corrispondenti. Fatto ciò, crea una nuova regola, dandogli un nome e un livello di gravità: `severity = $(SIG_HI)`.  Nel corpo verranno indicate le directory o i file a quali verrà applicata la regola che in questo caso è `$(SEC_INVARIANT) (recurse = 0)`; ossia non sono tollerati cambi di permessi o di proprietà nel primo livello della directory.
+
 ![rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Tripwire%20rule.png)
 
 Salva e chiudi il file al termine delle modifiche. Ora che il nostro file è configurato, dobbiamo implementarlo ricreando il file di policy crittografato che tripwire effettivamente legge:
@@ -149,7 +150,9 @@ Fatto ciò la macchina sarà infetta. Una volta avvenuto l'attacco lanciando il 
 sudo tripwire --check 
 ```
 inizierà la procedura di verifica la quale resituira il seguente report di output
+
 ![report](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Tripwire%20detect.png)
+
 ## Autori
 
 - [Mattia Scuriatti](https://github.com/Me77y99)
