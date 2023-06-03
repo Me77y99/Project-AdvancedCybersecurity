@@ -1,7 +1,6 @@
 
 # ProjectAdvancedCybersecurity
 Il seguente repository ha lo scopo di illustrare come configurare una rete di macchine virtuali al fine di testare alcuni software legati alla sicurezza informatica. L' architettura viene riportata in figura.
-![gif](https://github.com/Me77y99/ProjectPA/blob/main/Client-Server_WebSocketComm1080p.gif)
 ![Architettura della rete](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/Screened-Network.png)
 Le macchine virtuali sono le seguenti: 
  - **Target**: Ubuntu 22.04.2 LTS (con installato *Tripwire*)
