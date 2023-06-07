@@ -1,4 +1,5 @@
 
+
 # ProjectAdvancedCybersecurity
 Il seguente repository ha lo scopo di illustrare come configurare una rete di macchine virtuali al fine di testare alcuni software legati alla sicurezza informatica. L' architettura viene riportata in figura.
 
@@ -149,9 +150,27 @@ Fatto ciò la macchina sarà infetta. Una volta avvenuto l'attacco lanciando il 
 ```bash
 sudo tripwire --check 
 ```
-inizierà la procedura di verifica la quale resituira il seguente report di output:
+inizierà la procedura di verifica la quale restituisce il seguente report di output:
 
 ![report](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Tripwire%20detect.png)
+
+## Pfsense Firewall
+L'ultima macchina virtuale da inserire all'interno della reta sarà Pfsense, un distribuzione firewall open-source basata sul sistema operativo FreeBSD. Una volta finita la configurazione iniziale della macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN. In generale, l'indirizzo che viene attribuito può essere quello del router domestico (es: 192.168.1.1) o potrebbe non essere impostato. Dunque per impostarne uno manualmente (es: 192.168.1.2) basterà attivare il menù dedicato inviando il tasto `2`
+
+![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Pfsense%20menu.png)
+
+Fatto ciò, nella macchina target sarà possibile impostare come gateway tale interfaccia: 
+```bash
+sudo ip route add default via 192.186.1.2
+```
+ permettendo così a Pfsense di interporsi tra il router e la macchina Ubuntu. 
+ 
+ 1.Configurazione Pfsense
+----------
+Dalla macchina  Ubuntu attraverso un qualsiasi web browser sarà possibile accedere alla GUI per la configurazione di Pfsense (`http://192.168.1.2`) inserendo le credenziali di default: 
+
+ - **Username**: *admin*
+ - **Password**: *pfsense*
 
 ## Autori
 
