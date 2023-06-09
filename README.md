@@ -161,7 +161,7 @@ L'ultima macchina virtuale da inserire all'interno della reta sarà Pfsense, un 
 
 Fatto ciò, nella macchina target sarà possibile impostare come gateway tale interfaccia: 
 ```bash
-sudo ip route add default via 192.186.1.2
+sudo ip route add default via 192.168.1.2
 ```
  permettendo così a Pfsense di interporsi tra il router e la macchina Ubuntu. 
  
