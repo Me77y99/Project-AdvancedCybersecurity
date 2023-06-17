@@ -10,7 +10,7 @@ Le macchine virtuali sono le seguenti:
  - **Attacker**: Kali 2023.1 (con installato *python3*)
  - **Firewall**: Pfsense 2.6.0 (con i pacchetti *Squid* e *Snort*)
 
-Per quest'attività è stata configurata una rete interna a VirtualBox: `192.168.56.0 / 24` separata da quella domestica: `192.168.1.0 / 24`.
+Per quest'attività è stata configurata una rete interna a VirtualBox: `192.168.56.0 /24` separata da quella domestica: `192.168.1.0 /24`.
 Per fare ciò sono state configurate inizialmente le schede di rete virtuali delle macchine, queste in sostanza implementano un dispositivo fisico emulato dal software. La configurazione è la seguente: 
 
  - **Target**: una scheda di rete connessa alla rete interna (con alias "*intnet*")
