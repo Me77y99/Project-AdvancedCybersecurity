@@ -109,7 +109,7 @@ sudo tripwire --init
 Questo creerà il nostro file di database e genererà dei *warnings* che dobbiamo regolare nella configurazione.  Eseguire il comando `check` e posizionare l'output in un file chiamato `test_results` contenuto nella nostra directory di configurazione di tripwire (`etc/tripwire`):
 
 ```bash
-cd etc/tripwire
+cd /etc/tripwire
 sudo sh -c 'tripwire --check | grep Filename > test_results'
 ```
 
