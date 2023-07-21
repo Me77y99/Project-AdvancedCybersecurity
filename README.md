@@ -20,6 +20,7 @@ Per fare ciò sono state configurate inizialmente le schede di rete virtuali del
  Gli adattatori di VirtualBox in modalità *bridge* essenzialmente permettono di porre le macchine virutali allo stesso livello di rete delle macchine nella rete domestica. Dall'altra parte la modalità *rete interna* crea una sottorete con uno spazio di indirizzamento differente.
 
 Gli indirizzi IPv4 delle interfacce sono stati assegnati automaticamente da VirtualBox, ad eccezione di quelli appartenenti alla rete virtuale interna che sono stati configurati tramite il server DHCP di Pfsense (come verrrà illustrato). L'indirizzamento è riportato nella tabella sottostante.
+
 |VM  |IPv4 |Gateway |
 |--|--|--|--|
 | `Kali` | `192.168.1.23` |  `192.168.1.1`
