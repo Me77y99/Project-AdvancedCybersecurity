@@ -22,7 +22,7 @@ Per fare ciò sono state configurate inizialmente le schede di rete virtuali del
 Gli indirizzi IPv4 delle interfacce sono stati assegnati automaticamente da VirtualBox, ad eccezione di quelli appartenenti alla rete virtuale interna che sono stati configurati tramite il server DHCP di Pfsense (come verrrà illustrato). L'indirizzamento è riportato nella tabella sottostante.
 
 |VM  |IPv4 |Gateway |
-|--|--|--|--|
+|--|--|--|
 | `Kali` | `192.168.1.23` |  `192.168.1.1`
 | `Ubuntu`| `172.16.0.50`  |  `172.16.0.1`
 | `Pfsense`| WAN: `192.168.1.21`; LAN: `172.16.0.1` |  `192.168.1.1`
