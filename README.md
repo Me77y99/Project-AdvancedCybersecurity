@@ -1,6 +1,6 @@
 
 
-# ProjectAdvancedCybersecurity
+# Progetto Advanced Cybersecurity
 Il seguente repository ha lo scopo di illustrare come configurare una rete di macchine virtuali, al fine di testare alcuni software legati alla sicurezza informatica. L' architettura viene riportata in figura.
 
 ![Architettura](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Screened-Network.drawio.png)
