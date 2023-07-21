@@ -114,7 +114,7 @@ Lasciando inalterate le impostazioni di default, Tripwire ti chiederà di creare
 
 >  Nota: assicurati di scegliere passphrase non facilmente deducibili
 
- ###  Inizializzare il database 
+ ### 5.1 Inizializzare il database 
 ----------
 
 Il primo step è inizializzare il database che tripwire utilizzerà per convalidare il sistema. Questo utilizza il file delle policy e controlla i punti specificati all'interno. Poiché il file di default non è stato ancora personalizzato per il nostro sistema, avremo molti avvisi, falsi positivi ed errori. Per inizializzare il database eseguire:
@@ -142,7 +142,7 @@ Filename: /root/Mail
 Filename: /root/.xsession-errors
 . . .
 ```
- ###  Configurazione file delle policy 
+ ### 5.2 Configurazione file delle policy 
 ----------
 
 Ottenuto questo elenco si deve esaminare il file di policy e modificarlo per eliminare questi falsi positivi. Aprire il file *twpol.txt* nell' editor con i privilegi di root:
