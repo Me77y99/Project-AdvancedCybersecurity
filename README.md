@@ -54,7 +54,7 @@ Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operaz
   ----------
   Nonostante l'operazione precedente la comunicazione tra  `Kali` e `Ubuntu` viene impedita da una regola di default del Firewall che blocca le comunicazioni con indirizzi **RFC 1918** (quindi anche la famiglia `192.168.0.0  –  192.168.255.255`) . Questa può essere disabilitata dal menù **Firewall > Rules** premendo sull'ingranaggio e deselezionando la voce alla fine del menù in cui si è ridiretti.
   
-  ![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%rule.png)
+  ![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%20rule.png)
 
 Infine sono state aggiunte due regole per far passare il traffico da `Kali` verso `Pfsense` e `Ubuntu` 
 
