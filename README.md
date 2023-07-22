@@ -34,7 +34,7 @@ Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti 
 ## Configurazione
 Il primo componente inserito all'interno della reta è Pfsense, una distribuzione firewall open-source basata sul sistema operativo FreeBSD. Una volta avviata e configurata la macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN (la rete virtuale interna). Per impostarlo basterà attivare il menù `2) Set interface(s) IP address` e successivamente selezionare l'interfaccia LAN (nel caso in questione la numero `2`).  Una volta configurato l'indirizzo IPv4 dell'interfaccia come `172.16.0.1/24` è stato abilitato anche il server DHCP con il seguente range di indirizzi: `172.16.0.50 - 172.16.0.52` (questo operazione eviterà successivamente di impostare manualmente l'indirizzo della macchina `Ubuntu`). 
 
-![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Pfsense%20menu.png)
+![pfsensemenu](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/PfSense%20menu.png)
 
 Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile accedere alla GUI per la configurazione di Pfsense (`http://172.16.0.1`) inserendo le credenziali di default: 
 
@@ -54,7 +54,7 @@ Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operaz
   ----------
   Nonostante questo, la comunicazione tra  `Kali` e `Ubuntu` viene impedita da una regola di default del Firewall che blocca le comunicazioni con indirizzi **RFC 1918** (quindi anche la famiglia `192.168.0.0  –  192.168.255.255`) . Questa può essere disabilitata dal menù **Firewall > Rules** scheda **WAN** premendo sull'ingranaggio e deselezionando la voce alla fine del menù in cui si è ridiretti.
   
-  ![block rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%rule.png)
+  ![block rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%20rule.png)
 
 Infine sono state aggiunte due regole per far passare il traffico da `Kali` verso `Pfsense` e `Ubuntu` 
 
