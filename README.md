@@ -45,8 +45,11 @@ Le macchine virtuali sono le seguenti:
 Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 /24` separata da quella domestica: `192.168.1.0 /24`. Sono state configurate inizialmente le schede di rete virtuali delle macchine dal menù **Impostazioni > Rete**: 
 
  - **scheda 1 Ubuntu:** *rete interna* (con alias "*intnet*")
- - **scheda 1 Kali**:  *bridge*
+ - **scheda 1 Kali**:  *bridge* (raffigurato sotto)
  - **scheda 1 Pfsense**: *bridge*; **scheda 2 Pfsense**: *rete interna* (con alias "*intnet*").
+ 
+ ![kali net](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Kali%20net.png)
+ 
  
 L'indirizzamento è riportato nella tabella sottostante.
 
