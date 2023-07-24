@@ -9,11 +9,43 @@ Le macchine virtuali sono le seguenti:
  - **Target**: Ubuntu 22.04.2 LTS (con installato *Tripwire*)
  - **Attacker**: Kali 2023.1 (con installato *python3*)
  - **Firewall**: Pfsense 2.6.0 (con i pacchetti *Squid* e *Snort*)
+ 
+## Installazione delle macchine
+  ### Pfsense
+  ----
+ - Dal sito https://www.pfsense.org/download/ scaricare il file ISO.
+ - All'interno di  VirtualBox creare una nuova macchina virtuale basata su sistema
+   operativo BSD (Free-BSD 64-bit). Non sono necessarie grandi quantità di
+   risorse in termini di RAM, disco, processori e memoria video.
+ - dal menù **Impostazioni > Archiviazione** montare il file ISO
+   scaricato.
 
-Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 / 24` separata da quella domestica: `192.168.1.0 / 24`. Sono state configurate inizialmente le schede di rete virtuali delle macchine: 
+ 
+  ### Ubuntu 
+  ----
 
- - **scheda Ubuntu:** *rete interna* (con alias "*intnet*")
- - **scheda Kali**:  *bridge*
+   - Dal sito https://ubuntu.com/download/desktop scaricare il file ISO.
+ - All'interno di  VirtualBox creare una nuova macchina virtuale basata su sistema
+   operativo Linux (Ubuntu 64-bit). 
+ - Risorse minime: 2GB di RAM, 20GB di disco e  2 processori
+ - dal menù **Impostazioni > Archiviazione** montare il file ISO
+   scaricato.
+  ### Kali
+  ----
+ - Dal sito https://www.kali.org/get-kali/#kali-installer-images scaricare il file ISO.
+ - All'interno di  VirtualBox creare una nuova macchina virtuale basata su sistema
+   operativo Linux(Debian 64-bit). 
+ - Risorse minime: 2GB di RAM, 20GB di disco e  2 processori
+ - dal menù **Impostazioni > Archiviazione** montare il file ISO
+   scaricato.
+  
+
+## Configurazione
+
+Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 /24` separata da quella domestica: `192.168.1.0 /24`. Sono state configurate inizialmente le schede di rete virtuali delle macchine dal menù **Impostazioni > Rete**: 
+
+ - **scheda 1 Ubuntu:** *rete interna* (con alias "*intnet*")
+ - **scheda 1 Kali**:  *bridge*
  - **scheda 1 Pfsense**: *bridge*; **scheda 2 Pfsense**: *rete interna* (con alias "*intnet*").
  
 L'indirizzamento è riportato nella tabella sottostante.
@@ -22,14 +54,14 @@ L'indirizzamento è riportato nella tabella sottostante.
 |--|--|--|
 | `Kali` | `192.168.1.23` |  `192.168.1.1`
 | `Ubuntu`| `172.16.0.50`  |  `172.16.0.1`
-| `Pfsense`| WAN: `192.168.1.21`; LAN: `172.16.0.1` |  `192.168.1.1`
+| `Pfsense`| **WAN**: `192.168.1.21`; **LAN**: `172.16.0.1` |  `192.168.1.1`
  
-Facendo ciò è stata implementata una rete fedele all'architettura mostrata sopra. 
-Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e per la simulazione di scenari di attacco
+
+Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e per la simulazione degli attacci.
 
 > Nota: la relazione dettagliata è disponibile nel repository.
 
-> Nota: gli indirizzi assegnati dinamicamente potrebbero variare ad ogni avvio delle macchine.
+> Nota: gli indirizzi assegnati dinamicamente potrebbero variare ad ogni avvio delle macchine. Per maggiore sicurezza assegnarli manualmente.
 
 ## Configurazione
 Il primo componente inserito all'interno della reta è Pfsense, una distribuzione firewall open-source basata sul sistema operativo FreeBSD. Una volta avviata e configurata la macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN (la rete virtuale interna). Per impostarlo basterà attivare il menù `2) Set interface(s) IP address` e successivamente selezionare l'interfaccia LAN (nel caso in questione la numero `2`).  Una volta configurato l'indirizzo IPv4 dell'interfaccia come `172.16.0.1/24` è stato abilitato anche il server DHCP con il seguente range di indirizzi: `172.16.0.50 - 172.16.0.52` (questo operazione eviterà successivamente di impostare manualmente l'indirizzo della macchina `Ubuntu`). 
@@ -40,13 +72,22 @@ Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile acc
 
  1. **Username**: *admin*
  2. **Password**: *pfsense*
+
+![pfsensedashboard](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/PfSense%20dashboard.png)
+
+
  
   ### 1. Regole di NAT su Pfsense
 ----------
  Una volta finita la configurazione iniziale è stato necessario rendere visibile la macchina `Ubuntu` da `Kali`. Essendo su due segmenti di rete differenti è stato necessario creare un *VirtualIP* da mappare con l'indirizzo di `Ubuntu`.  Nello specifico:
  
  1. dal menù **Firewall > VirtualIP**: aggiungere un nuovo VirtualIP di tipo Alias: `192.168.1.51/32`
+ 
+![Virtual IP](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Virtual%20IP.png)
+
  2. dal menù **Firewall > NAT** , scheda **1:1**: aggiungere un nuovo mapping sull'interfaccia WAN tra l'host esterno `192.168.1.51/32` e quello interno `172.16.0.50`
+
+![Firewall NAT](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Firewall%20NAT.png)
 
 Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operazione di `ping`verso l'IP `192.168.1.51` verrà ridiretta  da Pfsense  verso l'IP interno `172.16.0.50`.
 
@@ -56,9 +97,9 @@ Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operaz
   
   ![block rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/block%20rule.png)
 
-Infine sono state aggiunte due regole per far passare il traffico da `Kali` verso `Pfsense` e `Ubuntu` 
+Infine è stata aggiunta una regola per far passare il traffico da `Kali` verso `Ubuntu`.
 
-(mettere immagine)
+![pass rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/pass%20rule.png)
 
 ### 3. Squid e SquidGuard su Pfsense
   ----------
@@ -90,12 +131,10 @@ Una volta salvate e applicate le regole i due servizi "gireranno" all'unisono e 
   ----------
   Dal menù **Services > Snort** nella scheda **General Settings** sono stati abilitati tutti i repository (nelle rispettive versioni gratuite) dai quali attingere le regole per rilevare possibili attacchi (disabilitando l'opzione per il blocco degli host malevoli); fatto ciò sono state scaricare le regole dalla scheda **Updates** attraverso il bottone *Update rules*.
 
-(foto dei repository)
+![snort rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/snort%20rule.png)
 
 Dalla scheda **Snort Interfaces** è stato aggiunta l'interfaccia su cui Snort effettuerà il rilevamento ossia la WAN di Pfsense.  Successivamente nella scheda **WAN Categories**
-sono state applicate tutte le regole per il rilevamento scaricate in precedenza.
-
-(vedere questione IPS e apply in WAN rules)
+sono state selezionate tutte le regole per il rilevamento scaricate in precedenza.
 
 Come ultimo passo è stato avviato Snort sull'interfaccia sempre dalla scheda **Snort Interfaces**.
   
