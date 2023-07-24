@@ -1,6 +1,6 @@
 
 
-# ProjectAdvancedCybersecurity
+# Progetto Advanced Cybersecurity
 Il seguente repository ha lo scopo di illustrare come implementare un'infrastruttura di macchine virtuali, al fine di testare alcuni software legati alla sicurezza informatica. L' architettura da implementare viene riportata in figura.
 
 ![Architettura](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Screened-Network.drawio.png)
@@ -87,7 +87,7 @@ Dalla macchina  `Ubuntu` attraverso un qualsiasi web browser sarà possibile acc
 
  2. dal menù **Firewall > NAT** , scheda **1:1**: aggiungere un nuovo mapping sull'interfaccia WAN tra l'host esterno `192.168.1.51/32` e quello interno `172.16.0.50`
 
-![Firewall NAT](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Firewall%20NAT%20.png)
+![Firewall NAT](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Firewall%20NAT.png)
 
 Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operazione di `ping`verso l'IP `192.168.1.51` verrà ridiretta  da Pfsense  verso l'IP interno `172.16.0.50`.
 
