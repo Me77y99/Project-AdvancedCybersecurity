@@ -42,7 +42,7 @@ Le macchine virtuali sono le seguenti:
 
 ## Configurazione
 
-Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 /24` separata da quella domestica: `192.168.1.0 /24`. Sono state configurate inizialmente le schede di rete virtuali delle macchine dal menù **Impostazioni > Rete**: 
+Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 /24` separata da quella domestica: `192.168.1.0 /24`. Per rendere ciò possibile, sono state configurate le schede di rete delle macchine tramite il menù di Virtualbox **Impostazioni > Rete**: 
 
  - **scheda 1 Ubuntu:** *rete interna* (con alias "*intnet*")
  - **scheda 1 Kali**:  *bridge*
@@ -56,9 +56,6 @@ L'indirizzamento è riportato nella tabella sottostante.
 | `Ubuntu`| `172.16.0.50`  |  `172.16.0.1`
 | `Pfsense`| **WAN**: `192.168.1.21`; **LAN**: `172.16.0.1` |  `192.168.1.1`
  
-
-Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e per la simulazione degli attacci.
-
 > Nota: la relazione dettagliata è disponibile nel repository.
 
 > Nota: gli indirizzi assegnati dinamicamente potrebbero variare ad ogni avvio delle macchine. Per maggiore sicurezza assegnarli manualmente.
