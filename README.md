@@ -42,7 +42,7 @@ Le macchine virtuali sono le seguenti:
 
 ## Configurazione
 
-Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 /24` separata da quella domestica: `192.168.1.0 /24`. Per rendere ciò possibile, sono state configurate le schede di rete delle macchine tramite il menù di Virtualbox **Impostazioni > Rete**: 
+Per quest'attività è stata configurata una rete interna a VirtualBox: `172.16.0.0 /24` separata da quella domestica: `192.168.1.0 /24`. Sono state configurate inizialmente le schede di rete virtuali delle macchine dal menù **Impostazioni > Rete**: 
 
  - **scheda 1 Ubuntu:** *rete interna* (con alias "*intnet*")
  - **scheda 1 Kali**:  *bridge*
@@ -56,6 +56,9 @@ L'indirizzamento è riportato nella tabella sottostante.
 | `Ubuntu`| `172.16.0.50`  |  `172.16.0.1`
 | `Pfsense`| **WAN**: `192.168.1.21`; **LAN**: `172.16.0.1` |  `192.168.1.1`
  
+
+Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e per la simulazione degli attacci.
+
 > Nota: la relazione dettagliata è disponibile nel repository.
 
 > Nota: gli indirizzi assegnati dinamicamente potrebbero variare ad ogni avvio delle macchine. Per maggiore sicurezza assegnarli manualmente.
@@ -96,7 +99,7 @@ Con questa configurazione ogni volta che `Kali` effettuerà ad esempio un operaz
 
 Infine è stata aggiunta una regola per far passare il traffico da `Kali` verso `Ubuntu`.
 
-![pass rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/pass%20rule.png)
+![pass rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Pass%20Rule.png)
 
 ### 3. Squid e SquidGuard su Pfsense
   ----------
@@ -128,7 +131,7 @@ Una volta salvate e applicate le regole i due servizi "gireranno" all'unisono e 
   ----------
   Dal menù **Services > Snort** nella scheda **General Settings** sono stati abilitati tutti i repository (nelle rispettive versioni gratuite) dai quali attingere le regole per rilevare possibili attacchi (disabilitando l'opzione per il blocco degli host malevoli); fatto ciò sono state scaricare le regole dalla scheda **Updates** attraverso il bottone *Update rules*.
 
-![snort rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/snort%20rule.png)
+![snort rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Snort%20rule.png)
 
 Dalla scheda **Snort Interfaces** è stato aggiunta l'interfaccia su cui Snort effettuerà il rilevamento ossia la WAN di Pfsense.  Successivamente nella scheda **WAN Categories**
 sono state selezionate tutte le regole per il rilevamento scaricate in precedenza.
