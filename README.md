@@ -150,9 +150,9 @@ sudo apt-get install tripwire
 ```
 Lasciando inalterate le impostazioni di default, `Tripwire` ti chiederà di creare due chiavi:
 
--   **site key** : questa chiave viene utilizzata per proteggere i file di configurazione. Dobbiamo assicurarci che i file di configurazione non vengano modificati, altrimenti non ci si può fidare del nostro intero sistema di rilevamento. 
+-   **site key** : questa chiave viene utilizzata per proteggere i file di configurazione;
     
--   **local key** : questa chiave viene utilizzata su ogni macchina per eseguire i binari. Ciò è necessario per garantire che i nostri file binari non vengano eseguiti senza il nostro consenso.
+-   **local key** : questa chiave viene utilizzata su ogni macchina per eseguire i binari.
 
 >  Nota: assicurati di scegliere passphrase non facilmente deducibili
 
