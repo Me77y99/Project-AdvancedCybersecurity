@@ -15,7 +15,7 @@ https://univpm-my.sharepoint.com/:f:/g/personal/s1108648_studenti_univpm_it/En0-
 
 > Nota: la relazione dettagliata è disponibile nel repository.
 
-> Nota: se si usano le macchine preconfigurate passare alle sezione **Test Tripwire**, **Test Squid** e **Test Snort**
+> Nota: se si usano le macchine preconfigurate bisogna creare una NAT Network nel proprio virtualizzatore e poi si può passare alle sezione **Test Tripwire**, **Test Squid** e **Test Snort**
 
 ## Installazione delle macchine
   ### Pfsense
