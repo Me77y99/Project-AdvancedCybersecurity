@@ -140,7 +140,7 @@ Una volta salvate e applicate le regole, i due servizi "gireranno" all'unisono e
 
 ![snort rule](https://github.com/Me77y99/Project-AdvancedCybersecurity/blob/main/img/Snort%20rule.png)
 
-Dalla scheda **Snort Interfaces** è stato aggiunta l'interfaccia su cui Snort effettuerà il rilevamento ossia la WAN di Pfsense.  Successivamente nella scheda **WAN Categories**
+Dalla scheda **Snort Interfaces** è stata aggiunta l'interfaccia su cui Snort effettuerà il rilevamento ossia la WAN di Pfsense.  Successivamente nella scheda **WAN Categories**
 sono state selezionate tutte le regole per il rilevamento scaricate in precedenza.
 
 Come ultimo passo è stato avviato Snort sull'interfaccia sempre dalla scheda **Snort Interfaces**.
