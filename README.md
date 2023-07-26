@@ -10,7 +10,7 @@ Le macchine virtuali sono le seguenti:
  - **Attacker**: Kali 2023.1 (con installato *python3*)
  - **Firewall**: Pfsense 2.6.0 (con i pacchetti *Squid* e *Snort*)
 
-e sono disponibili già preconfigurate nella cartella condivisa disponibile dal seguente url:
+e sono disponibili già preconfigurate nella cartella condivisa disponibile al seguente url:
 https://univpm-my.sharepoint.com/:f:/g/personal/s1108648_studenti_univpm_it/En0-ULIiDpRLgscPrYsplgQB_jYHVS4v2n5tKBSNIyn1Lg?e=J6zcWS
 
 > Nota: la relazione dettagliata è disponibile nel repository.
