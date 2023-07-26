@@ -251,7 +251,7 @@ Dove i parametri:
 
  **3° Terminale**: Ora tramite metaspoilt avvieremo l'*handler* che attenderà l'instaurazione di una *Meterpeter session* verso il `target`
 ```bash
-msfconsle
+msfconsole
 ```
 Una volta aperta la console:
 ```bash
